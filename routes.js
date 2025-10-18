@@ -510,7 +510,10 @@ router.get('/greet', (req, res) => {
   logInfo('GET /greet');
   const acceptLang = String(req.headers['accept-language'] || '').toLowerCase();
   const lang = String(req.query.lang || '').toLowerCase();
-  const isZh = lang === 'zh' || lang === 'zh-cn' || acceptLang.includes('zh');
+  // 默认返回中文；如果明确指定英文或 Accept-Language 不含中文且 lang= en，则返回英文
+  const explicitEn = lang === 'en' || lang === 'en-us';
+  const explicitZh = lang === 'zh' || lang === 'zh-cn' || lang === 'zh-hans' || lang === 'zh-hant';
+  const isZh = explicitZh || (!explicitEn && (acceptLang.includes('zh') || !lang));
   const name = req.query.name ? String(req.query.name) : null;
   const greeting = isZh ? (name ? `你好，${name}` : '你好') : (name ? `Hello, ${name}` : 'Hello');
   res.json({ greeting, language: isZh ? 'zh' : 'en' });
@@ -520,7 +523,7 @@ router.get('/greet/:lang', (req, res) => {
   const lang = String(req.params.lang || '').toLowerCase();
   logInfo(`GET /greet/${lang}`);
   const name = req.query.name ? String(req.query.name) : null;
-  if (lang.startsWith('zh')) {
+  if (!lang || lang.startsWith('zh')) {
     res.json({ greeting: name ? `你好，${name}` : '你好', language: 'zh' });
   } else {
     res.json({ greeting: name ? `Hello, ${name}` : 'Hello', language: 'en' });
