@@ -505,6 +505,28 @@ async function handleDirectMessages(req, res) {
   }
 }
 
+// 简单中文问候路由（支持根据 Accept-Language 或路径/查询参数返回中英文问候）
+router.get('/greet', (req, res) => {
+  logInfo('GET /greet');
+  const acceptLang = String(req.headers['accept-language'] || '').toLowerCase();
+  const lang = String(req.query.lang || '').toLowerCase();
+  const isZh = lang === 'zh' || lang === 'zh-cn' || acceptLang.includes('zh');
+  const name = req.query.name ? String(req.query.name) : null;
+  const greeting = isZh ? (name ? `你好，${name}` : '你好') : (name ? `Hello, ${name}` : 'Hello');
+  res.json({ greeting, language: isZh ? 'zh' : 'en' });
+});
+
+router.get('/greet/:lang', (req, res) => {
+  const lang = String(req.params.lang || '').toLowerCase();
+  logInfo(`GET /greet/${lang}`);
+  const name = req.query.name ? String(req.query.name) : null;
+  if (lang.startsWith('zh')) {
+    res.json({ greeting: name ? `你好，${name}` : '你好', language: 'zh' });
+  } else {
+    res.json({ greeting: name ? `Hello, ${name}` : 'Hello', language: 'en' });
+  }
+});
+
 // 注册路由
 router.post('/v1/chat/completions', handleChatCompletions);
 router.post('/v1/responses', handleDirectResponses);

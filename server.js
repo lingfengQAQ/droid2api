@@ -28,6 +28,8 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     description: 'OpenAI Compatible API Proxy',
     endpoints: [
+      'GET /greet',
+      'GET /greet/:lang',
       'GET /v1/models',
       'POST /v1/chat/completions',
       'POST /v1/responses',
@@ -87,6 +89,8 @@ app.use((req, res, next) => {
     message: `路径 ${req.method} ${req.path} 不存在`,
     timestamp: errorInfo.timestamp,
     availableEndpoints: [
+      'GET /greet',
+      'GET /greet/:lang',
       'GET /v1/models',
       'POST /v1/chat/completions',
       'POST /v1/responses',
@@ -121,6 +125,8 @@ app.use((err, req, res, next) => {
     .on('listening', () => {
       logInfo(`Server running on http://localhost:${PORT}`);
       logInfo('Available endpoints:');
+      logInfo('  GET  /greet');
+      logInfo('  GET  /greet/:lang');
       logInfo('  GET  /v1/models');
       logInfo('  POST /v1/chat/completions');
       logInfo('  POST /v1/responses');
